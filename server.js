@@ -1,6 +1,9 @@
 const express = require("express");
 const cors = require("cors");
-const puppeteer = require("puppeteer");
+const puppeteer = require("puppeteer-extra");
+const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+
+puppeteer.use(StealthPlugin());
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,7 +26,9 @@ app.post("/api/download-instagram-reel", async (req, res) => {
     });
 
     const videoTitle = await page.evaluate(() => {
-      const titleElement = document.querySelector("h2.item-title");
+      const titleElement = document.querySelector(
+        "h2._aacl._aaco._aacu._aacx._aad7._aade"
+      );
       return titleElement ? titleElement.innerText : null;
     });
 
@@ -35,8 +40,13 @@ app.post("/api/download-instagram-reel", async (req, res) => {
       res.status(404).json({ error: "Video not found" });
     }
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Error fetching Instagram reel data" });
+    console.error("Error fetching Instagram reel data:", error);
+    res
+      .status(500)
+      .json({
+        error: "Error fetching Instagram reel data",
+        details: error.message,
+      });
   }
 });
 
