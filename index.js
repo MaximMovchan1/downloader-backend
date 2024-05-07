@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const puppeteer = require("puppeteer ");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+require("dotenv").config();
 
 puppeteer.use(StealthPlugin());
 
@@ -15,7 +16,16 @@ app.post("/api/download-instagram-reel", async (req, res) => {
   try {
     const { reelUrl } = req.body;
     const browser = await puppeteer.launch({
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--single-process",
+        "--no-zygote",
+      ],
+      executablePath:
+        process.env.NODE_ENV === "production"
+          ? process.env.PUPPETEER_EXECUTABLE_PATH
+          : puppeteer.executablePath(),
     });
     const page = await browser.newPage();
     await page.goto(reelUrl, { waitUntil: "networkidle2" });
@@ -41,12 +51,10 @@ app.post("/api/download-instagram-reel", async (req, res) => {
     }
   } catch (error) {
     console.error("Error fetching Instagram reel data:", error);
-    res
-      .status(500)
-      .json({
-        error: "Error fetching Instagram reel data",
-        details: error.message,
-      });
+    res.status(500).json({
+      error: "Error fetching Instagram reel data",
+      details: error.message,
+    });
   }
 });
 
