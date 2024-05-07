@@ -1,10 +1,7 @@
 const express = require("express");
 const cors = require("cors");
-const puppeteer = require("puppeteer ");
-const StealthPlugin = require("puppeteer-extra-plugin-stealth");
+const puppeteer = require("puppeteer");
 require("dotenv").config();
-
-puppeteer.use(StealthPlugin());
 
 const app = express();
 const PORT = process.env.PORT || 3000;
